@@ -220,7 +220,7 @@ def logout():
 	time.sleep(4)
 	driver.find_element(By.XPATH,"/html/body/div[1]/section/nav/div[2]/div/div/div[3]/div/div[3]/a").click()
 	time.sleep(4)
-	driver.find_element(By.XPATH,"/html/body/div[1]/section/main/div/header/section/div[1]/div/button/span").click()
+	driver.find_element(By.XPATH,"/html/body/div[1]/section/main/div/header/section/div[1]/div/button").click()
 	time.sleep(4)
 	driver.find_element(By.XPATH,"/html/body/div[4]/div/div/div/button[9]").click()
 	driver.quit()
