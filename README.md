@@ -17,7 +17,7 @@ Requirements--------
     python3
 
     ChromeDriver 79.0.3945.79
-    location of ChromeDriver--->   /home/[userr]/Documents/chromedriver
+    location of ChromeDriver--->   /home/[username]/Documents/chromedriver
 
     google-chrome should have the following location----
     /home/[username]/.config/google-chrome
