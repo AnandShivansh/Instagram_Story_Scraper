@@ -36,10 +36,8 @@ from selenium.webdriver.common.by import By
 
 from selenium.webdriver.common.keys import Keys
 
-from signal import signal, SIGINT
-
-import requests
-
-import json
-
 import sqlite3
+
+Database File Created--->
+
+record.db
