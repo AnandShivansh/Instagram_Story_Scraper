@@ -220,40 +220,42 @@ def logout():
 	time.sleep(4)
 	driver.find_element(By.XPATH,"/html/body/div[1]/section/nav/div[2]/div/div/div[3]/div/div[3]/a").click()
 	time.sleep(4)
+	handle_name=driver.find_element(By.XPATH,"/html/body/div[1]/section/main/div/header/section/div[1]/h1").text
 	driver.find_element(By.XPATH,"/html/body/div[1]/section/main/div/header/section/div[1]/div/button").click()
 	time.sleep(4)
 	driver.find_element(By.XPATH,"/html/body/div[4]/div/div/div/button[9]").click()
 	driver.quit()
-def create_database(seen_list,follow_list,unique_reel):
+	return handle_name
+def create_database(handle_name,seen_list,follow_list,unique_reel):
 	conn=sqlite3.connect('record.db')
-	query='CREATE TABLE IF NOT EXISTS TB(ID PRIMARY KEY);'
+	query="CREATE TABLE IF NOT EXISTS '%s'(ID PRIMARY KEY);"%(handle_name)
 	conn.execute(query)
 	conn.commit()
 	for x in follow_list:
-		query="SELECT EXISTS(SELECT 1 FROM TB WHERE ID='%s' LIMIT 1);"%(x)
+		query="SELECT EXISTS(SELECT 1 FROM '%s' WHERE ID='%s' LIMIT 1);"%(handle_name,x)
 		AS=conn.execute(query)
 		ck=0
 		for row in AS:
 			ck=row[0]
 		if ck==0:
-			query="INSERT INTO TB (ID) VALUES ('%s');"%(x)
+			query="INSERT INTO '%s' (ID) VALUES ('%s');"%(handle_name,x)
 			conn.execute(query)
 			conn.commit()
 	uu="S"+unique_reel
-	query="SELECT "+uu+" FROM TB LIMIT 1;"
+	query="SELECT "+uu+" FROM '%s' LIMIT 1;"%(handle_name)
 	try:
 		ax=conn.execute(query)
 	except:
-		query="ALTER TABLE TB ADD %s INT DEFAULT 0;"%(uu)
+		query="ALTER TABLE '%s' ADD %s INT DEFAULT 0;"%(handle_name,uu)
 		conn.execute(query)
 		conn.commit()
 	for x in seen_list:
-		query="UPDATE TB SET %s=1 WHERE ID='%s';"%(uu,x)
+		query="UPDATE '%s' SET %s=1 WHERE ID='%s';"%(handle_name,uu,x)
 		conn.execute(query)
 		conn.commit()
-	query='SELECT * FROM TB;'
+	query="SELECT * FROM '%s';"%(handle_name)
 	aaa=conn.execute(query)
-	query='SELECT * FROM TB;'
+	query="SELECT * FROM '%s';"%(handle_name)
 	cr=conn.execute(query)
 	col_name=[description[0] for description in cr.description]
 	fcl=[]
@@ -296,9 +298,9 @@ query_hashf=get_query_hashf()
 print("Getting query_hash_for_followers : Done")
 follow_list=get_followers(query_hashf,idf)
 print("Getting followers_list : Done")
-logout()
+handle_name=logout()
 print("Log Out : Done")
 if len(seen_list)!=0 and unique_reel!="":
-	create_database(seen_list,follow_list,unique_reel)
+	create_database(handle_name,seen_list,follow_list,unique_reel)
 	print("Creating Database : Done")
 	print("Viewers Count : ",count)
