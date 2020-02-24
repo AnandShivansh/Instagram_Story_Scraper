@@ -32,3 +32,8 @@ Packages to be present ----->
 Database File Created--->
 
     record.db
+    
+To run the script---->
+    
+    python3 insta_scrap.py
+    python3 each_story_viewer.py
