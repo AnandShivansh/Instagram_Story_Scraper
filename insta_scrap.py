@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import sqlite3
 options = webdriver.ChromeOptions()
-options.add_argument('--headless')
+# options.add_argument('--headless')
 stream = os.popen('echo $USER')
 output = stream.read()
 userr=output.split('\n')[0]
@@ -218,7 +218,11 @@ def get_followers(query_hashf,idf):
 def logout():
 	driver.get("https://www.instagram.com/")
 	time.sleep(4)
-	driver.find_element(By.XPATH,"/html/body/div[1]/section/nav/div[2]/div/div/div[3]/div/div[3]/a").click()
+	driver.find_element(By.XPATH,"/html/body/div[4]/div/div/div/div[3]/button[2]").click()
+	try:
+		driver.find_element(By.XPATH,"/html/body/div[1]/section/nav/div[2]/div/div/div[3]/div/div[3]/a").click()
+	except:
+		e=2
 	time.sleep(4)
 	handle_name=""
 	try:
