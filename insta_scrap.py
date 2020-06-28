@@ -227,7 +227,10 @@ def logout():
 		handle_name=driver.find_element(By.XPATH,"/html/body/div[1]/section/main/div/header/section/div[1]/h2").text
 	driver.find_element(By.XPATH,"/html/body/div[1]/section/main/div/header/section/div[1]/div/button").click()
 	time.sleep(4)
-	driver.find_element(By.XPATH,"/html/body/div[4]/div/div/div/button[9]").click()
+	try:
+		driver.find_element(By.XPATH,"/html/body/div[4]/div/div/div/button[9]").click()
+	except:
+		driver.find_element(By.XPATH,"/html/body/div[4]/div/div/div/div/button[9]").click()
 	driver.quit()
 	return handle_name
 def create_database(handle_name,seen_list,follow_list,unique_reel):
