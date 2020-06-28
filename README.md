@@ -37,3 +37,5 @@ To run the script---->
     
     python3 insta_scrap.py
     python3 each_story_viewer.py
+Important---->
+    Do update chromedriver when updating chrome.
