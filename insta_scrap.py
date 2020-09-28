@@ -4,20 +4,30 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import sqlite3
 options = webdriver.ChromeOptions()
-# options.add_argument('--headless')
+options.add_argument('--headless')
 stream = os.popen('echo $USER')
 output = stream.read()
 userr=output.split('\n')[0]
 options.add_argument("user-data-dir=/home/"+userr+"/.config/google-chrome/Default")
 driver = webdriver.Chrome("/home/"+userr+"/Documents/chromedriver",chrome_options=options)
+driver.get("https://www.instagram.com/accounts/login/?source=auth_switcher")
 def login():
 	driver.get("https://www.instagram.com/accounts/login/?source=auth_switcher")
 	time.sleep(4)
 	Handle = input("Phone number, user name, or email : \t")
 	Pass = getpass.getpass(prompt="Password : \t")
-	driver.find_element(By.XPATH, "/html/body/div[1]/section/main/div/article/div/div[1]/div/form/div[2]/div/label/input").send_keys(Handle)
-	driver.find_element(By.XPATH, "/html/body/div[1]/section/main/div/article/div/div[1]/div/form/div[3]/div/label/input").send_keys(Pass)
-	driver.find_element(By.XPATH, "/html/body/div[1]/section/main/div/article/div/div[1]/div/form/div[4]/button/div").click()
+	try:
+		driver.find_element(By.XPATH, "/html/body/div[1]/section/main/div/article/div/div[1]/div/form/div[2]/div/label/input").send_keys(Handle)
+	except:
+		driver.find_element(By.XPATH, "/html/body/div[1]/section/main/div/article/div/div[1]/div/form/div/div[1]/div/label/input").send_keys(Handle)
+	try:
+		driver.find_element(By.XPATH, "/html/body/div[1]/section/main/div/article/div/div[1]/div/form/div[3]/div/label/input").send_keys(Pass)
+	except:
+		driver.find_element(By.XPATH, "/html/body/div[1]/section/main/div/article/div/div[1]/div/form/div/div[2]/div/label/input").send_keys(Pass)
+	try:
+		driver.find_element(By.XPATH, "/html/body/div[1]/section/main/div/article/div/div[1]/div/form/div/div[3]/button/div").click()
+	except:
+		driver.find_element(By.XPATH, "/html/body/div[1]/section/main/div/article/div/div[1]/div/form/div[4]/button/div").click()
 	time.sleep(4)
 	try:
 		driver.find_element(By.XPATH,"/html/body/div[4]/div/div/div[3]/button[2]").click()
@@ -72,6 +82,7 @@ def getting_total_seens_count(query_hash,reel_id):
 	q=driver.find_element(By.XPATH,"/html/body/pre").text
 	q=q.split(',')
 	count=""
+	username=""
 	for x in q:
 		x=x.replace('{','')
 		x=x.replace('}','')
@@ -79,13 +90,17 @@ def getting_total_seens_count(query_hash,reel_id):
 		x=x.replace('[','')
 		x=x.replace(']','')
 		t=x.split(':')
+		# print(t)
 		if len(t)>=3:
 			if t[1]=='count':
 				count=t[2]
+		if len(t)>=2:
+			if t[0]=='username':
+				username=t[1]
 	if count=="":
 		return 0
 	else:
-		return int(count)
+		return int(count),username
 def getting_seens(query_hash,reel_id,count):
 	seen_list=[]
 	cursor_pos=0
@@ -215,20 +230,16 @@ def get_followers(query_hashf,idf):
 					follow_list.append(t[1])
 	follow_list=set(follow_list)
 	return follow_list
-def logout():
-	driver.get("https://www.instagram.com/")
+def logout(handle_name):
+	driver.get("https://www.instagram.com/"+handle_name)
 	time.sleep(4)
-	driver.find_element(By.XPATH,"/html/body/div[4]/div/div/div/div[3]/button[2]").click()
-	try:
-		driver.find_element(By.XPATH,"/html/body/div[1]/section/nav/div[2]/div/div/div[3]/div/div[3]/a").click()
-	except:
-		e=2
-	time.sleep(4)
-	handle_name=""
-	try:
-		handle_name=driver.find_element(By.XPATH,"/html/body/div[1]/section/main/div/header/section/div[1]/h1").text
-	except:
-		handle_name=driver.find_element(By.XPATH,"/html/body/div[1]/section/main/div/header/section/div[1]/h2").text
+	# driver.find_element(By.XPATH,"/html/body/div[1]/section/nav/div[2]/div/div/div[3]/div/div[5]/div[1]").click()
+	# time.sleep(4)
+	# handle_name=""
+	# try:
+	# 	handle_name=driver.find_element(By.XPATH,"/html/body/div[1]/section/main/div/header/section/div[1]/h1").text
+	# except:
+	# 	handle_name=driver.find_element(By.XPATH,"/html/body/div[1]/section/main/div/header/section/div[1]/h2").text
 	driver.find_element(By.XPATH,"/html/body/div[1]/section/main/div/header/section/div[1]/div/button").click()
 	time.sleep(4)
 	try:
@@ -236,7 +247,6 @@ def logout():
 	except:
 		driver.find_element(By.XPATH,"/html/body/div[4]/div/div/div/div/button[9]").click()
 	driver.quit()
-	return handle_name
 def create_database(handle_name,seen_list,follow_list,unique_reel):
 	conn=sqlite3.connect('record.db')
 	query="CREATE TABLE IF NOT EXISTS '%s'(ID PRIMARY KEY);"%(handle_name)
@@ -297,7 +307,7 @@ print("Getting reel_id : Done")
 idf=reel_id
 query_hash=get_query_hash()
 print("Getting query_hash_for_story : Done")
-count=getting_total_seens_count(query_hash,reel_id)
+count,handle_name=getting_total_seens_count(query_hash,reel_id)
 print("Getting Seen Count : Done")
 unique_reel=get_unique_reel(query_hash,reel_id)
 print("Getting unique_reel : Done")
@@ -309,7 +319,7 @@ query_hashf=get_query_hashf()
 print("Getting query_hash_for_followers : Done")
 follow_list=get_followers(query_hashf,idf)
 print("Getting followers_list : Done")
-handle_name=logout()
+logout(handle_name)
 print("Log Out : Done")
 if len(seen_list)!=0 and unique_reel!="":
 	create_database(handle_name,seen_list,follow_list,unique_reel)
